@@ -1,0 +1,240 @@
+#!/bin/bash
+# $Id: rrecord 2074 2016-12-07 06:42:46Z foo $
+#
+
+# arguments
+#
+station=$1
+fname=$2
+maxtime=$3
+
+# some parameters:
+
+# if set, invoking command + timestamp and pwd will be appended here
+commandlog="$HOME/.rrecord-log"
+
+# @@TODO:  there is the unexp log..
+
+# after no data for this long, script will retry
+speedTimeout=5
+
+#############################################################################
+# radio stations and URLs
+# (read/grep from a file?  refreshed from the net?)
+#
+case $station in
+    dronezone) name=soma-drone  url="http://ice3.somafm.com/dronezone-128-mp3";;
+    # 2018.08
+  # maybe wavefarm doesn't like our client ?
+  wavefarm) name=wavefarm    url="http://audio.wavefarm.org:8000/transmissionarts.mp3";;
+# 2018.04
+  wmbr)     name=wmbr        url=http://wmbr.org:8000/hi;;
+  spin*)      name=s.spinoza url=http://knight.wavestreamer.com:4462/Live;;
+  kqed)     name=kqed        url=https://streams2.kqed.org/kqedradio;;
+
+ # older
+  wdcb)     name=wdcb        url=http://wdcb-ice.streamguys.org:80/wdcb;;
+  wteb)     name=wteb        url=http://pubint.ic.llnwd.net/stream/pubint_preclassical;;
+  wbur)     name=wbur        url=http://wbur-sc.streamguys.com/wburlive;;
+    q2)     name=q2          url=http://wqxr-q2.streamguys.com/q2;;
+  kmxt)     name=kmxt        url=http://s9.viastreaming.net:7900/;;
+  wusb)     name=wusb        url=http://stream.wusb.stonybrook.edu:8090/;;
+  kzsu)     name=kzsu        url=http://171.66.118.110/kzsu-1-128.mp3;;
+  wamu)     name=wamu        url=http://wamu-1.streamguys.com:80;;
+  wdvx)     name=wdvx        url=http://nyc01.egihosting.com:8962/;;
+
+  pax)      name=paxahau     url=http://216.150.224.151:8000;;
+  kpft)     name=kpft        url=http://stream.kpft.org:8000/live;;
+  wvpr)     name=wvpr        url=http://live.str3am.com:7820/;;
+  wium)     name=wium        url=http://pubint.ic.llnwd.net/stream/pubint_wium;;
+  krwg)     name=krwg        url=http://pubint.ic.llnwd.net/stream/pubint_krwg;; 
+  krnn)     name=krnn        url=http://stream.ktoo.org:8000/krnn;;
+  kboo)     name=kboo        url=http://live.kboo.fm:8000/high;;
+
+    wpvm  | \
+    mainfm)  name=mainfm      url=http://stream.main-fm.org:8000/main-fm-128k.mp3;;
+    wdfh)    name=wdfh        url=http://streaming.wdfh.org:8010/;;
+    ktsw)    name=ktsw        url=http://ktswlive.txstate.edu:8002/listen;;
+    whrv)    name=whrv        url=http://64.5.130.41:80/;;
+    kuvo)    name=kuvo        url=http://kuvo-ice.streamguys.org:80/kuvo-mp3-64;;
+    kpfa)    name=kpfa        url=http://streams.kpfa.org:8000/kpfa_64;;
+    kpfk)    name=kpfk        url=http://sc1.mainstreamnetwork.com:9042/;;
+    kpbs)    name=kpbs  url=http://kpbs.streamguys.tv:80/;;
+    kcpw)    name=kcpw        url=http://stream.xmission.com/kcpw2;;
+    kkgo)    name=kkgo        url='http://208.80.54.71:80/KKGOFM1AACCMP3';;
+     wojb)   name=wojb        url='http://live.str3am.com:2720/';;
+    wrvo2)   name=wrvo2       url='http://pubint.ic.llnwd.net/stream/pubint_wrvo2';;
+  guanaca)   name=guanaca     url=http://peace.str3am.com:6710/;;
+     wbez)   name=wbez        url=http://sc4.ord.llnw.net:80/stream/wbez_91_5_fm;;
+     chly)   name=chly        url=http://70.66.0.163:8002/;;
+     weos)   name=weos        url=http://pubint.ic.llnwd.net/stream/pubint_weos;;
+     kbia)   name=kbia        url=http://pubint.ic.llnwd.net/stream/pubint_kbia;;
+     *chu)   name=kchu        url=http://66.232.113.200:8072;;
+  kmuwhd2)   name=kmuwhd2    url=http://kmuw-streamer.Wichita.edu:8000/kmuwhd2;;
+      vpr)   name=vpr        url=http://vprhigh.streamguys.net:8000;;
+  nether*)   name=rnetherlands  url=http://shoutcast.omroep.nl:8050/;;
+     *duq)   name=wduq       url="https://playerservices.streamtheworld.com/api/livestream-redirect/WESAFM.mp3";;
+                                 # https://20793.live.streamtheworld.com:443/WESAFM.mp3
+				 # https://16853.live.streamtheworld.com/WESAFM.mp3;;
+				 # was, until 2017.01 - http://wesa.streamguys.com:80/live;;
+ soundart)   name=soundart  url=http://icecast.commedia.org.uk:8000/soundart.mp3;;
+
+  *zbc)     name=wzbc        url=http://amber.streamguys.com:4860/;;
+  wuml)     name=wuml        url=http://129.63.96.7:8000/mp3_92;;
+antioch)    name=antioch     url=http://grace.fast-serv.com:9022;;
+   wxyc)    name=wxyc        url=http://152.46.7.128:8000/wxyc.mp3;;
+   kexp)    name=kexp        url=http://kexp-mp3-2.cac.washington.edu:8000/;;
+   lov*)   name=lovbot      url=http://82.227.210.183:8000/stream;;
+   free103) name=free103     url='http://216.235.91.30:14802/play';;
+# free103 was:				  http://216.235.91.32:20836/play?membername=&session=free103point9:0&AuthType=NORMAL&bitrate=128&lid=508-usa&SaneID=128.147.38.10-1162488097236847&now=1169154419169&from=pls&tag=live365&token=a85742c0e93be9dd2ba9ab56c2d2facb-0621180080200000&LID=508-usa';;
+   # simulcast
+   kcrw)  name=kcrw  url=http://scfire-dtc-aa04.stream.aol.com:80/stream/1046;;
+#			 http://scfire-dll-aa02.stream.aol.com:80/stream/1046;; 
+#			 http://scfire-chi-aa04.stream.aol.com:80/stream/1046;; 
+#http://64.236.34.97:80/stream/1046;;
+
+   *nyc)  name=wnyc   url=http://wnycfm.streamguys.com/;;
+   res*)  name=resonance  url=http://54.77.136.103:8000/resonance;;
+# http://icecast.commedia.org.uk:8000/resonance.mp3;;
+   kfcf)  name=kfcf     url=http://www.kfcf.org:8000/icy_0;;
+#   kfjc) name=kfjc url=http://netcast.kfjc.org/x.mp3;;
+   kfjc)    name=kfjc    url=http://netcast.kfjc.org:8976/;;
+   kfjclo)  name=kfjc    url=http://live.southeastsound.com:12680/;;
+
+   *rct)    name=wrct    url=http://stream.wrct.org:8000/wrct-hi.mp3;; 
+#  *fmu)    name=wfmu    url=http://216.32.166.79:21694/;;
+   *fmu)    name=wfmu    url=http://mp3stream.wfmu.org;;
+   *fmulo*) name=wfmu    url=http://wfmu.oven.com:8004;;
+   # WFTE NE PA, Scranton
+   wfte)    name=wfte    url="http://us1.streamingpulse.com:8020/stream";;
+   *rur)    name=wrur    url=http://radio.cwru.edu/cgi-bin/swsend/tmp/hiqsource;;
+#  *mfo)    name=wmfo    url=http://130.64.208.92:8000/;;
+   *mfo)    name=wmfo    url=http://166.90.143.157:13174/;;
+   *uci)    name=kuci    url=http://kuci.org:8000;;
+   *csb)    name=wcsb    url=http://wcsb.org/cgi-bin/swsend/tmp/source2;;
+  chem*)    name=chemlab url=http://mp3.chemlab.org:8000;;
+   *sum)    name=wsum    url=http://wsum.wisc.edu:8000/;;
+   *uac)    name=kuac    url=http://linux10.cs.uaf.edu:8000/kuac64mono;;
+   *uaclo)  name=kuac    url=http://linux10.cs.uaf.edu:8000/kuac16mono;;
+   # Fairbanks open radio
+   kwrk)    name=kwrk    url=https://bit.ly/2M94Abr;;
+
+   # radio free nashville
+   *rfn)    name=wrfn    url=http://s2.radioboss.fm:8048/stream;;
+   *unc)    name=wunc    url=http://152.2.63.108:8000/;;
+   *mse)    name=wmse    url=http://wmse.msoe.edu:9000/;; 
+   # wozo knoxville
+   wozo)    name=wozo    url=http://188.165.240.90:8802/stream;;
+    evr)    name=evr  url=http://www.eastvillageradio.com:8010/evr;;
+
+   ufo*)  name=ufonet   url='http://66.28.48.191:20086/play?session=ufonet:0&amp;lid=508&amp;SaneID=10.1.1.10-1010042366303';;
+
+   *kcr)  name=wkcr     url=http://wkcr.streamguys1.com:80/live;;
+   
+   http*) 
+      echo station unknown, assuming URL
+      name=`echo $station| sed -e 's=/.*==;s=.*/==;s=:.*=='`
+      url=$station ;;
+esac
+#############################################################################
+
+#
+# figure out (unique) filename
+#
+# inputs:  name fname
+# output:  file
+function getName() {
+  local name=$name
+  if [ "$fname" ]; then
+    name=$name-$fname;
+    echo name NOW: $name
+  fi
+
+  pre=`date +%Y%m%d.%H%M`
+  suf=''
+
+  file="$pre$suf-$name".mp3
+
+  while [ -f $file ]; do
+    suf0=$suf
+  #  echo "cmd: perl -e 'print ++\$ARGV[0]' $suf"
+    suf=`perl -e 'print ++$ARGV[0]' $suf`
+    suf1=$suf
+    [ $suf = 1 ] && suf=a
+    suf2=$suf
+
+  #  echo -n " -- suf $suf0 -> $suf1"
+
+    file="$pre$suf-$name".mp3
+
+
+  done
+  echo ========= getName returning $file
+  # return $file
+}
+
+echo calling getName..
+getName
+echo file set?:  $file
+#############################################################################
+
+if [ "$maxtime" ]; then
+  args="-m $maxtime"
+fi
+
+# new timeout is experimental..
+#speedTimeout=5
+args="$args -y $speedTimeout"
+# for https urls, ignore 
+args="$args -k"
+
+if [ -n "$commandlog" ]; then
+  (echo "#" `date` wd:  `pwd` ; echo  $0 "$station"  "$fname"  "$maxtime")  >> "$commandlog"
+fi
+
+if [ "$maxtime" ]; then
+  # if time was specidified, thats when we want to end
+  now=`date +%s`
+  endtime=$[ now + maxtime ]
+  
+  while [ $endtime -gt $now ]; do
+    echo 
+    echo station: $station
+    echo name: $name
+    echo url: $url
+    echo "cmd:        curl -k -o $file $args $url"
+    curl -A 'Mozilla/4.0 (compatible; MSIE 4.01; Windows 95)' -L -k -o $file $args "$url"
+    cstat=$?
+    echo ======================= curl exited with code $cstat
+    case $cstat in 
+      3)  echo bad url, i should exit;;
+      6)  echo name resolution issue, try again in 5secs...; 
+	       sleep 5;;
+      7)  echo netowrk problem?  try again in  a few..
+	       sleep 5;;
+     28)  echo did we finish;;
+    143)  echo is someone trying to kill us?;;
+      *)  echo unknown status, see:  unexpected-status.log
+	  echo `date` $0 unknown curl stats: $cstat "(args: $*)" "cmd: curl -k -o $file $args $url" >> $HOME/unexpected-status.log
+    esac
+    # max time will be:  
+    now=`date +%s` 
+    maxtime=$[ endtime - now ]
+    args="-m $maxtime  -y $speedTimeout"
+    # new name too
+    #file=$(getName)
+    getName
+    echo ====================== new name will be:  $file
+  done
+
+echo ENDW
+  
+else
+ # @@ TODO redundant..  just do above, but set enditme to now+1 to avoid looping
+ echo 
+ echo station: $station
+ echo name: $name
+ echo url: $url
+ echo "cmd:        curl -k -o $file $args $url"
+ curl -k -o $file $args "$url"
+fi
