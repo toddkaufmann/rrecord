@@ -73,10 +73,13 @@ case $station in
   kmuwhd2)   name=kmuwhd2    url=http://kmuw-streamer.Wichita.edu:8000/kmuwhd2;;
       vpr)   name=vpr        url=http://vprhigh.streamguys.net:8000;;
   nether*)   name=rnetherlands  url=http://shoutcast.omroep.nl:8050/;;
-     *duq)   name=wduq       url="https://playerservices.streamtheworld.com/api/livestream-redirect/WESAFM.mp3";;
+     *duq)   name=wduq       url="https://ais-sa3.cdnstream1.com/2556_128.mp3";;
+				 # "https://playerservices.streamtheworld.com/api/livestream-redirect/WESAFM.mp3";;
                                  # https://20793.live.streamtheworld.com:443/WESAFM.mp3
 				 # https://16853.live.streamtheworld.com/WESAFM.mp3;;
-				 # was, until 2017.01 - http://wesa.streamguys.com:80/live;;
+                                 # was, until 2017.01 - http://wesa.streamguys.com:80/live;;
+
+     
  soundart)   name=soundart  url=http://icecast.commedia.org.uk:8000/soundart.mp3;;
 
   *zbc)     name=wzbc        url=http://amber.streamguys.com:4860/;;
@@ -94,8 +97,9 @@ antioch)    name=antioch     url=http://grace.fast-serv.com:9022;;
 #http://64.236.34.97:80/stream/1046;;
 
    *nyc)  name=wnyc   url=http://wnycfm.streamguys.com/;;
-   res*)  name=resonance  url=http://54.77.136.103:8000/resonance;;
-# http://icecast.commedia.org.uk:8000/resonance.mp3;;
+   res*)  name=resonance  url=https://stream.resonance.fm/resonance-backup;;
+   # http://54.77.136.103:8000/resonance;;
+   # http://icecast.commedia.org.uk:8000/resonance.mp3;;
    kfcf)  name=kfcf     url=http://www.kfcf.org:8000/icy_0;;
 #   kfjc) name=kfjc url=http://netcast.kfjc.org/x.mp3;;
    kfjc)    name=kfjc    url=http://netcast.kfjc.org:8976/;;
@@ -103,7 +107,8 @@ antioch)    name=antioch     url=http://grace.fast-serv.com:9022;;
 
    *rct)    name=wrct    url=http://stream.wrct.org:8000/wrct-hi.mp3;; 
 #  *fmu)    name=wfmu    url=http://216.32.166.79:21694/;;
-   *fmu)    name=wfmu    url=http://mp3stream.wfmu.org;;
+   *fmu)    name=wfmu    url=http://wfmu.org/wfmu_aac.pls;;
+# http://mp3stream.wfmu.org;;
    *fmulo*) name=wfmu    url=http://wfmu.oven.com:8004;;
    # WFTE NE PA, Scranton
    wfte)    name=wfte    url="http://us1.streamingpulse.com:8020/stream";;
