@@ -107,7 +107,9 @@ antioch)    name=antioch     url=http://grace.fast-serv.com:9022;;
 
    *rct)    name=wrct    url=http://stream.wrct.org:8000/wrct-hi.mp3;; 
 #  *fmu)    name=wfmu    url=http://216.32.166.79:21694/;;
-   *fmu)    name=wfmu    url=http://wfmu.org/wfmu_aac.pls;;
+   *fmu)    name=wfmu    # url=http://wfmu.org/wfmu_aac.pls;;  playlist, not a stream
+                         # this is one entry from the playlist
+                         url=http://stream0.wfmu.org/freeform-high.aac;;
 # http://mp3stream.wfmu.org;;
    *fmulo*) name=wfmu    url=http://wfmu.oven.com:8004;;
    # WFTE NE PA, Scranton
@@ -222,6 +224,7 @@ if [ "$maxtime" ]; then
       *)  echo unknown status, see:  unexpected-status.log
 	  echo `date` $0 unknown curl stats: $cstat "(args: $*)" "cmd: curl -k -o $file $args $url" >> $HOME/unexpected-status.log
     esac
+    sleep 3
     # max time will be:  
     now=`date +%s` 
     maxtime=$[ endtime - now ]
